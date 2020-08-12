@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import { connect } from 'react-redux'
 import { getMovieData } from '../constants/agents'
-import { MOVIE_CLEAR, TOGGLE_MOVIE } from '../constants/actionTypes'
+import { MOVIE_CLEAR, TOGGLE_MOVIE, ADD_MOVIE } from '../constants/actionTypes'
 import moment from 'moment'
 import ReactLoading from 'react-loading'
 
@@ -14,6 +14,7 @@ const mapDispatchToProps = (dispatch) => {
 		getMovie: imdbID => dispatch(getMovieData(imdbID)),
 		clearMovie: () => dispatch({type: MOVIE_CLEAR}),
 		toggleMovie: imdbID => dispatch({type: TOGGLE_MOVIE, id: imdbID}),
+		addMovie: data => dispatch({type: ADD_MOVIE, data: data}),
 	}
 }
 
@@ -22,7 +23,6 @@ class Movie extends React.Component {
 
 	constructor() {
 		super()
-		
 	}
 
 	componentDidMount() {
@@ -38,11 +38,15 @@ class Movie extends React.Component {
 		let index = this.props.myList.findIndex(x => x.imdbID == this.imdbID )
 		let buttonText
 
-
+		//doesn't exist
 		if (this.props.myList[index] == undefined) {
-			return
+			return (<div className='d-flex align-items-center'>
+				<i style={{fontSize: 40}} className="far fa-heart favicon mr-2" onClick={()=>this.props.addMovie(this.props.data)}></i>
+				<span><strong> add to favourites</strong></span>
+			</div>)
 		}
 
+		//exists
 		if (this.props.myList[index].isWatching) {
 			buttonText = 'watching' 
 		} else {
@@ -61,21 +65,20 @@ class Movie extends React.Component {
 
 	}
 
-
 	render() {
 	return (
 		<div>
 			{this.props.data && 
 				<div>
-					<div className="d-flex align-items-center">
-						<div style={{width: 180}} className="poster">
+					<h2>{this.props.data.Title}</h2>
+					<div className="d-flex align-items-start">
+						<div style={{width: 140,flexShrink: 0,}} className="poster">
 							<img className="rounded w-100" style={{objectFit: 'cover'}} src={this.props.data.Poster}/>
 							<span><i className="fas fa-video"></i>  {this.props.data.Type}</span>
 							<SeasonTag data={this.props.data.totalSeasons} />
 							
 						</div>
-						<div className='p-4'>
-							<h2>{this.props.data.Title}</h2>
+						<div className='px-4'>
 							<p><i className='fas fa-calendar pr-2 text-muted'></i>{this.props.data.Year}</p>
 							<p><i className='fas fa-clock pr-2 text-muted'></i>{this.props.data.Runtime}</p>
 							<p><i className='fas fa-quote-right pr-2 text-muted'></i>{this.props.data.Genre}</p>
@@ -93,8 +96,6 @@ class Movie extends React.Component {
 
 				</div>
 			}			
-
-
 
 			{this.props.inProgress && <ReactLoading color="#3498db" type="spin" className="m-auto"/>}
 			{this.props.error && <p className="text-warning">something went wrong :/</p>}

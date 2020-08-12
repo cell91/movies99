@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { ADD_MOVIE, REMOVE_MOVIE } from '../constants/actionTypes'
 import {Link} from 'react-router-dom'
+import {useSpring, animated} from 'react-spring'
 
 
 const mapDispatchToProps = dispatch => {
@@ -45,14 +46,24 @@ function ResultItem(props) {
 		}
 	}
 
+	//anims
+	const cssFadeIn = useSpring({
+		from: {
+			opacity: 0,
+		},
+		to: {
+			opacity: 1,
+		}
+	})
+
 
 	return (
-		<li className='list-group-item d-flex align-items-center'>
+		<animated.li style={cssFadeIn} className='list-group-item d-flex align-items-center'>
 			<div>
 				<img width='100' className="rounded" style={{objectFit: 'cover'}} src={props.data.Poster}/>
 			</div>
 
-			<div className='p-4'>
+			<div  className='p-4'>
 				{_renderLabel()}
 				<h4>{props.data.Title} </h4>
 				<p>{props.data.Year}</p>
@@ -65,7 +76,7 @@ function ResultItem(props) {
 			</div>
 
 			
-		</li>
+		</animated.li>
 	)
 }
 
